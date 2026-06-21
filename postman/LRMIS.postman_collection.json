@@ -1,0 +1,168 @@
+{
+  "info": {
+    "name": "LRMIS",
+    "description": "Land Registration Management Information System API examples.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/health",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "health"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Applications",
+      "item": [
+        {
+          "name": "Create Application",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "demo-application-001"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"application_type\": \"ownership_transfer\",\n  \"priority\": \"normal\",\n  \"applicant_id\": \"675100000000000000000101\",\n  \"parcel_number\": \"145\",\n  \"block_number\": \"12\",\n  \"basin_number\": \"3\",\n  \"zone_id\": \"ZONE-RM-01\",\n  \"description\": \"Ownership transfer application for parcel 145, block 12.\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/applications/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "applications",
+                ""
+              ]
+            }
+          }
+        },
+        {
+          "name": "Transition Application",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"next_state\": \"pre_checked\",\n  \"actor_type\": \"registrar\",\n  \"actor_id\": \"staff_14\",\n  \"reason\": \"Initial pre-check completed.\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/applications/{{application_id}}/transition",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "applications",
+                "{{application_id}}",
+                "transition"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Applicants",
+      "item": [
+        {
+          "name": "Create Applicant",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"full_name\": \"Nour Ahmad\",\n  \"applicant_type\": \"citizen\",\n  \"national_id\": \"400000000\",\n  \"email\": \"nour@example.com\",\n  \"phone\": \"+970599000000\",\n  \"city\": \"Ramallah\",\n  \"zone_id\": \"ZONE-RM-01\",\n  \"preferred_language\": \"ar\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/applicants/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "applicants",
+                ""
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Analytics",
+      "item": [
+        {
+          "name": "KPIs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/analytics/kpis",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "analytics",
+                "kpis"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Parcel GeoJSON",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/analytics/geofeeds/parcels",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "analytics",
+                "geofeeds",
+                "parcels"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://127.0.0.1:8000"
+    },
+    {
+      "key": "application_id",
+      "value": "LRMIS-2026-0001"
+    }
+  ]
+}
