@@ -16,7 +16,7 @@ The project is intentionally organized around the required modules from the fina
 ## Tech Stack
 
 - Backend: FastAPI, PyMongo, Pydantic, MongoDB.
-- Frontend: React or Streamlit.
+- Frontend: React.
 - Map: OpenStreetMap, Leaflet, GeoJSON.
 - Documentation: README, docs, OpenAPI, Postman.
 - Collaboration: GitHub issues, pull requests, branches, GitHub Actions.
@@ -79,21 +79,12 @@ http://127.0.0.1:8000/docs
 
 ## Frontend Setup
 
-The team can choose React or Streamlit.
-
-React placeholder:
+The frontend will use React with Leaflet for the map screens.
 
 ```bash
 cd frontend
 npm install
 npm run dev
-```
-
-Streamlit placeholder:
-
-```bash
-cd frontend
-streamlit run app.py
 ```
 
 ## MongoDB Setup
