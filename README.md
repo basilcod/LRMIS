@@ -242,3 +242,4 @@ postman/LRMIS.postman_collection.json
 - Team tasks: `docs/TEAM_TASKS.md`
 - Demo scenario: `docs/DEMO_SCENARIO.md`
 - GitHub workflow: `docs/GITHUB_WORKFLOW.md`
+- Backend foundation: `docs/BACKEND_FOUNDATION.md`
