@@ -22,6 +22,9 @@ const homeByRole = {
   manager: "/analytics"
 };
 
+const routerBasename =
+  import.meta.env.BASE_URL === "/" ? undefined : import.meta.env.BASE_URL.replace(/\/$/, "");
+
 export function App() {
   const [role, setRoleState] = useState(() => localStorage.getItem("lrmis-role"));
 
@@ -39,7 +42,7 @@ export function App() {
   }, []);
 
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={routerBasename}>
       <Routes>
         {!role ? (
           <Route path="*" element={<RoleSelectionPage setRole={setRole} />} />
