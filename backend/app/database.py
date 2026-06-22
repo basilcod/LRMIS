@@ -31,7 +31,7 @@ def close_mongo_client() -> None:
 
 
 def ensure_indexes(database: Database | None = None) -> None:
-    db = database or get_database()
+    db = database if database is not None else get_database()
 
     db.land_applications.create_index([("application_id", ASCENDING)], unique=True)
     db.land_applications.create_index([("status", ASCENDING)])
