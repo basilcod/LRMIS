@@ -1,4 +1,4 @@
-from app.routers import analytics, applicants, applications, portal, staff
+from app.routers import analytics, applicants, applications, portal, staff, survey
 
 __all__ = [
     "analytics",
@@ -6,4 +6,5 @@ __all__ = [
     "applications",
     "portal",
     "staff",
+    "survey",
 ]

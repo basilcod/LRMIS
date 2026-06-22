@@ -107,6 +107,8 @@ Important fields:
 - `workload.active_tasks`.
 - `workload.max_tasks`.
 - `active`.
+- `contacts`.
+- `created_at`, `updated_at`.
 
 ## survey_tasks
 
@@ -115,13 +117,21 @@ Stores assigned survey work.
 Important fields:
 
 - `task_id`.
-- `application_id`.
+- `application_id`: public application ID, for example `LRMIS-2026-0001`.
+- `application_object_id`.
 - `parcel_id`.
 - `assigned_surveyor_id`.
 - `status`.
 - `milestones`.
 - `field_notes`.
 - `report_uploaded`.
+- `created_at`, `updated_at`.
+
+Valid milestone flow:
+
+```text
+assigned -> visit_scheduled -> arrived_on_site -> survey_started -> survey_completed -> report_uploaded -> registrar_reviewed
+```
 
 ## survey_reports
 
@@ -130,7 +140,8 @@ Stores survey report metadata.
 Important fields:
 
 - `report_id`.
-- `application_id`.
+- `application_id`: public application ID.
+- `application_object_id`.
 - `survey_task_id`.
 - `surveyor_id`.
 - `file_name`.
@@ -138,6 +149,9 @@ Important fields:
 - `summary`.
 - `submitted_at`.
 - `registrar_review_status`.
+- `reviewed_by`.
+- `reviewed_at`.
+- `review_notes`.
 
 ## performance_logs
 
@@ -158,6 +172,13 @@ Applicant portal events:
 - `document_added`.
 - `comment_added`.
 - `objection_submitted`.
+
+Staff/survey events:
+
+- `survey_assigned`.
+- `survey_milestone_added`.
+- `survey_report_uploaded`.
+- `registrar_reviewed_survey`.
 
 ## certificates
 
