@@ -207,6 +207,18 @@ Important fields:
 - `verification.qr_code_url`.
 - `verification.digital_signature_stub`.
 
+## Analytics and GeoJSON Sources
+
+The analytics module is read-only and does not introduce a separate collection. It aggregates from:
+
+- `land_applications` for KPI totals, status/type/zone counts, delayed applications, hotspot zones, and pending heatmap features.
+- `parcels` for parcel GeoJSON FeatureCollection output.
+- `certificates` for certificates issued per month.
+- `survey_tasks` joined with `staff_members` for surveyor workload.
+- `survey_reports` joined with `staff_members` for registrar workload.
+
+Analytics queries use MongoDB aggregation stages such as `$facet`, `$group`, `$match`, `$sort`, `$project`, `$lookup`, and `$unwind`.
+
 ## Required MongoDB Indexes
 
 ```python

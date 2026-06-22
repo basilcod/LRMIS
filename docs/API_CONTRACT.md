@@ -320,6 +320,61 @@ Registrar review rules:
 | `GET` | `/analytics/geofeeds/parcels` | Return parcel GeoJSON feed. |
 | `GET` | `/analytics/geofeeds/pending-heatmap` | Return pending application heat-map GeoJSON. |
 
+KPI response includes:
+
+```json
+{
+  "total_applications": 5,
+  "applications_by_status": {
+    "submitted": 1,
+    "approved": 1
+  },
+  "applications_by_type": {
+    "ownership_transfer": 3
+  },
+  "pending_applications": 2,
+  "approved_applications": 1,
+  "rejected_applications": 1,
+  "under_objection_applications": 1,
+  "average_processing_time_days": 10.0,
+  "certificates_issued_total": 2,
+  "certificates_issued_per_month": [
+    {
+      "month": "2026-06",
+      "count": 1
+    }
+  ],
+  "delayed_applications": [],
+  "hotspot_zones": []
+}
+```
+
+Grouping endpoints return lists:
+
+```json
+[
+  {
+    "status": "submitted",
+    "count": 3
+  }
+]
+```
+
+Zone analytics response:
+
+```json
+[
+  {
+    "zone_id": "ZONE-RM-01",
+    "total": 4,
+    "pending": 2,
+    "approved": 1,
+    "rejected": 0,
+    "under_objection": 1
+  }
+]
+```
+
 GeoJSON response shape:
 
 ```json
@@ -328,3 +383,11 @@ GeoJSON response shape:
   "features": []
 }
 ```
+
+Rules:
+
+- Analytics are read-only and use MongoDB aggregation from existing collections.
+- Pending application counts include `submitted`, `pre_checked`, `survey_required`, `surveyed`, `legal_review`, `missing_documents`, `on_hold`, and `under_objection`.
+- Delayed applications default to pending applications older than 30 days; `/analytics/kpis?delayed_after_days=45` can adjust the threshold.
+- Parcel geofeed features use parcel geometries from `parcels.geometry`.
+- Pending heatmap features are GeoJSON `Point` features derived from pending application parcel geometry centroids.
