@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "LRMIS",
-    "description": "Land Registration Management Information System API examples.",
+    "description": "Land Registration Management Information System API examples for the final demo.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -10,16 +10,41 @@
       "request": {
         "method": "GET",
         "header": [],
-        "url": {
-          "raw": "{{base_url}}/health",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "health"
-          ]
-        }
+        "url": "{{base_url}}/health"
       }
+    },
+    {
+      "name": "Applicants",
+      "item": [
+        {
+          "name": "Create Applicant",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"full_name\": \"Nour Ahmad\",\n  \"applicant_type\": \"citizen\",\n  \"verification_state\": \"unverified\",\n  \"national_id\": \"400000999\",\n  \"registration_number\": null,\n  \"contacts\": {\n    \"email\": \"nour.demo@example.com\",\n    \"phone\": \"+970599000999\"\n  },\n  \"address\": {\n    \"city\": \"Ramallah\",\n    \"neighborhood\": \"Al Tireh\",\n    \"zone_id\": \"ZONE-RM-01\"\n  },\n  \"preferred_language\": \"ar\",\n  \"notification_preferences\": {\n    \"preferred_contact\": \"email\",\n    \"on_status_change\": true,\n    \"on_missing_documents\": true,\n    \"on_certificate_ready\": true\n  },\n  \"privacy_settings\": {\n    \"share_contact_with_staff\": true,\n    \"allow_sms_notifications\": true,\n    \"allow_email_notifications\": true\n  }\n}"
+            },
+            "url": "{{base_url}}/applicants/"
+          }
+        },
+        {
+          "name": "Get Applicant",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/applicants/{{applicant_id}}"
+          }
+        },
+        {
+          "name": "Applicant Applications",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/applicants/{{applicant_id}}/applications"
+          }
+        }
+      ]
     },
     {
       "name": "Applications",
@@ -29,140 +54,220 @@
           "request": {
             "method": "POST",
             "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Idempotency-Key",
-                "value": "demo-application-001"
-              }
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Idempotency-Key", "value": "demo-application-001" }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"application_type\": \"ownership_transfer\",\n  \"priority\": \"normal\",\n  \"applicant_id\": \"675100000000000000000101\",\n  \"parcel_number\": \"145\",\n  \"block_number\": \"12\",\n  \"basin_number\": \"3\",\n  \"zone_id\": \"ZONE-RM-01\",\n  \"description\": \"Ownership transfer application for parcel 145, block 12.\"\n}"
+              "raw": "{\n  \"application_type\": \"ownership_transfer\",\n  \"priority\": \"normal\",\n  \"applicant_ref\": {\n    \"applicant_id\": \"{{applicant_id}}\",\n    \"applicant_type\": \"citizen\",\n    \"submitted_by_representative\": false\n  },\n  \"parcel_ref\": {\n    \"parcel_number\": \"145\",\n    \"block_number\": \"12\",\n    \"basin_number\": \"3\",\n    \"zone_id\": \"ZONE-RM-01\",\n    \"geometry\": {\n      \"type\": \"Polygon\",\n      \"coordinates\": [[[35.2001, 31.9001], [35.2008, 31.9001], [35.2008, 31.9008], [35.2001, 31.9001]]]\n    },\n    \"area_sqm\": 840.5,\n    \"land_use\": \"residential\"\n  },\n  \"description\": \"Ownership transfer application for parcel 145.\",\n  \"required_documents\": [\n    {\n      \"document_type\": \"ownership_deed\",\n      \"required\": true,\n      \"status\": \"uploaded\"\n    }\n  ]\n}"
             },
-            "url": {
-              "raw": "{{base_url}}/applications/",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "applications",
-                ""
-              ]
-            }
+            "url": "{{base_url}}/applications/"
+          }
+        },
+        {
+          "name": "List Applications",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/applications/"
+          }
+        },
+        {
+          "name": "Get Application",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/applications/{{application_id}}"
           }
         },
         {
           "name": "Transition Application",
           "request": {
             "method": "PATCH",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"next_state\": \"pre_checked\",\n  \"actor_type\": \"registrar\",\n  \"actor_id\": \"staff_14\",\n  \"reason\": \"Initial pre-check completed.\"\n}"
+              "raw": "{\n  \"target_state\": \"pre_checked\",\n  \"actor_type\": \"registrar\",\n  \"actor_id\": \"{{registrar_id}}\",\n  \"note\": \"Initial pre-check completed.\",\n  \"has_objection\": false,\n  \"survey_report_exists\": false,\n  \"legal_review_completed\": false\n}"
             },
-            "url": {
-              "raw": "{{base_url}}/applications/{{application_id}}/transition",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "applications",
-                "{{application_id}}",
-                "transition"
-              ]
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "Applicants",
-      "item": [
-        {
-          "name": "Create Applicant",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"full_name\": \"Nour Ahmad\",\n  \"applicant_type\": \"citizen\",\n  \"national_id\": \"400000000\",\n  \"email\": \"nour@example.com\",\n  \"phone\": \"+970599000000\",\n  \"city\": \"Ramallah\",\n  \"zone_id\": \"ZONE-RM-01\",\n  \"preferred_language\": \"ar\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/applicants/",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "applicants",
-                ""
-              ]
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "Analytics",
-      "item": [
-        {
-          "name": "KPIs",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/analytics/kpis",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "analytics",
-                "kpis"
-              ]
-            }
+            "url": "{{base_url}}/applications/{{application_id}}/transition"
           }
         },
         {
-          "name": "Parcel GeoJSON",
+          "name": "Hold Application",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Waiting for applicant clarification.\",\n  \"actor_id\": \"{{registrar_id}}\",\n  \"actor_type\": \"registrar\"\n}"
+            },
+            "url": "{{base_url}}/applications/{{application_id}}/hold"
+          }
+        },
+        {
+          "name": "Reject Application",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Application did not satisfy registration rules.\",\n  \"actor_id\": \"{{registrar_id}}\",\n  \"actor_type\": \"registrar\"\n}"
+            },
+            "url": "{{base_url}}/applications/{{application_id}}/reject"
+          }
+        },
+        {
+          "name": "Issue Certificate",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"certificate_type\": \"ownership_certificate\",\n  \"issued_by\": \"{{registrar_id}}\",\n  \"issued_to_name\": \"Nour Ahmad\"\n}"
+            },
+            "url": "{{base_url}}/applications/{{approved_application_id}}/certificate"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Portal Timeline",
+      "item": [
+        {
+          "name": "Add Document Metadata",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"applicant_id\": \"{{applicant_id}}\",\n  \"document_type\": \"ownership_deed\",\n  \"file_name\": \"ownership_deed.pdf\",\n  \"storage_ref\": \"demo/ownership_deed.pdf\",\n  \"verification_status\": \"pending_review\"\n}"
+            },
+            "url": "{{base_url}}/applications/{{application_id}}/documents"
+          }
+        },
+        {
+          "name": "Add Applicant Comment",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"applicant_id\": \"{{applicant_id}}\",\n  \"message\": \"I uploaded the requested ownership deed.\"\n}"
+            },
+            "url": "{{base_url}}/applications/{{application_id}}/comments"
+          }
+        },
+        {
+          "name": "Submit Objection",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"applicant_id\": \"{{applicant_id}}\",\n  \"reason\": \"Boundary information needs registrar review.\",\n  \"supporting_document_ids\": []\n}"
+            },
+            "url": "{{base_url}}/applications/{{application_id}}/objections"
+          }
+        },
+        {
+          "name": "Application Timeline",
           "request": {
             "method": "GET",
             "header": [],
-            "url": {
-              "raw": "{{base_url}}/analytics/geofeeds/parcels",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "analytics",
-                "geofeeds",
-                "parcels"
-              ]
-            }
+            "url": "{{base_url}}/applications/{{application_id}}/timeline"
           }
         }
+      ]
+    },
+    {
+      "name": "Staff Survey Registrar",
+      "item": [
+        {
+          "name": "Create Surveyor",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"staff_code\": \"SURV-RM-10\",\n  \"name\": \"Survey Demo Team\",\n  \"role\": \"surveyor\",\n  \"department\": \"Cadastral Survey\",\n  \"skills\": [\"boundary_survey\", \"gps_mapping\"],\n  \"coverage\": {\n    \"zone_ids\": [\"ZONE-RM-01\"],\n    \"geo_fence\": null\n  },\n  \"schedule\": {\n    \"timezone\": \"Asia/Jerusalem\",\n    \"shifts\": [{\"day\": \"Mon\", \"start\": \"08:00\", \"end\": \"16:00\"}],\n    \"on_call\": false\n  },\n  \"workload\": {\n    \"active_tasks\": 0,\n    \"max_tasks\": 10\n  },\n  \"contacts\": {\"email\": \"survey_demo@example.com\"},\n  \"active\": true\n}"
+            },
+            "url": "{{base_url}}/staff/"
+          }
+        },
+        {
+          "name": "Get Surveyor",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/staff/{{surveyor_id}}"
+          }
+        },
+        {
+          "name": "Auto Assign Surveyor",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{base_url}}/applications/{{application_id}}/auto-assign-surveyor"
+          }
+        },
+        {
+          "name": "Add Survey Milestone",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"milestone\": \"visit_scheduled\",\n  \"by_staff_id\": \"{{surveyor_id}}\",\n  \"actor_role\": \"surveyor\",\n  \"notes\": \"Visit scheduled for Thursday.\",\n  \"meta\": {}\n}"
+            },
+            "url": "{{base_url}}/applications/{{application_id}}/survey-milestone"
+          }
+        },
+        {
+          "name": "Register Survey Report",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"surveyor_id\": \"{{surveyor_id}}\",\n  \"file_name\": \"survey_report.pdf\",\n  \"storage_ref\": \"demo/survey_report.pdf\",\n  \"summary\": \"Boundary points verified.\",\n  \"actor_role\": \"surveyor\"\n}"
+            },
+            "url": "{{base_url}}/applications/{{application_id}}/survey-report"
+          }
+        },
+        {
+          "name": "Registrar Review",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reviewer_id\": \"{{registrar_id}}\",\n  \"decision\": \"approved\",\n  \"notes\": \"Survey report accepted.\",\n  \"actor_role\": \"registrar\"\n}"
+            },
+            "url": "{{base_url}}/applications/{{approved_application_id}}/registrar-review"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Analytics and Map",
+      "item": [
+        { "name": "KPIs", "request": { "method": "GET", "header": [], "url": "{{base_url}}/analytics/kpis" } },
+        { "name": "Applications by Status", "request": { "method": "GET", "header": [], "url": "{{base_url}}/analytics/applications-by-status" } },
+        { "name": "Applications by Zone", "request": { "method": "GET", "header": [], "url": "{{base_url}}/analytics/applications-by-zone" } },
+        { "name": "Processing Time", "request": { "method": "GET", "header": [], "url": "{{base_url}}/analytics/processing-time" } },
+        { "name": "Surveyor Analytics", "request": { "method": "GET", "header": [], "url": "{{base_url}}/analytics/surveyors" } },
+        { "name": "Registrar Analytics", "request": { "method": "GET", "header": [], "url": "{{base_url}}/analytics/registrars" } },
+        { "name": "Parcel GeoJSON", "request": { "method": "GET", "header": [], "url": "{{base_url}}/analytics/geofeeds/parcels" } },
+        { "name": "Pending Heatmap", "request": { "method": "GET", "header": [], "url": "{{base_url}}/analytics/geofeeds/pending-heatmap" } }
       ]
     }
   ],
   "variable": [
-    {
-      "key": "base_url",
-      "value": "http://127.0.0.1:8000"
-    },
-    {
-      "key": "application_id",
-      "value": "LRMIS-2026-0001"
-    }
+    { "key": "base_url", "value": "http://127.0.0.1:8000" },
+    { "key": "applicant_id", "value": "675100000000000000000101" },
+    { "key": "application_id", "value": "LRMIS-2026-0001" },
+    { "key": "approved_application_id", "value": "LRMIS-2026-0002" },
+    { "key": "surveyor_id", "value": "675100000000000000000301" },
+    { "key": "registrar_id", "value": "675100000000000000000302" }
   ]
 }

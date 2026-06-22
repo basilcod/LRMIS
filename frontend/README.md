@@ -65,3 +65,14 @@ npm run build
 6. Open Live Map to view parcel GeoJSON and pending heatmap points.
 7. Open Analytics to review KPIs, status counts, zone hotspots, workloads, and processing time.
 8. Open Certificate View to inspect certificate metadata for issued applications.
+
+Useful seeded IDs after running `cd backend && python seed_data.py`:
+
+| Item | ID | Use |
+| --- | --- | --- |
+| Applicant | `675100000000000000000101` | Submit/track applicant actions. |
+| Surveyor | `675100000000000000000301` | Survey task milestones and report metadata. |
+| Registrar | `675100000000000000000302` | Registrar review and certificate actions. |
+| Survey application | `LRMIS-2026-0001` | Survey task execution demo. |
+| Approved application | `LRMIS-2026-0002` | Certificate issuance demo. |
+| Issued certificate sample | `LRMIS-2026-0003` | Certificate view and analytics demo. |
