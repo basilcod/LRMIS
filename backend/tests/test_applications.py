@@ -335,6 +335,51 @@ def test_full_approval_certificate_and_close_flow():
     assert db.land_applications.documents[0]["certificate_state"]["certificate_issued"] is True
 
 
+def test_existing_certificate_syncs_application_state():
+    db = FakeDatabase()
+    create_ready_application(db)
+
+    for target_state, extra in [
+        (ApplicationStatus.PRE_CHECKED, {}),
+        (ApplicationStatus.SURVEY_REQUIRED, {}),
+        (ApplicationStatus.SURVEYED, {"survey_report_exists": True}),
+        (ApplicationStatus.LEGAL_REVIEW, {}),
+        (ApplicationStatus.APPROVED, {"legal_review_completed": True}),
+    ]:
+        transition_application(
+            db,
+            "LRMIS-2026-0001",
+            ApplicationTransitionRequest(
+                target_state=target_state,
+                actor_id="registrar_09",
+                **extra,
+            ),
+        )
+
+    db.certificates.insert_one(
+        {
+            "certificate_id": "CERT-2026-0099",
+            "application_id": "LRMIS-2026-0001",
+            "status": "issued",
+        }
+    )
+
+    certificate = issue_certificate(
+        db,
+        "LRMIS-2026-0001",
+        CertificateCreateRequest(
+            issued_by="registrar_09",
+            issued_to_name="Nour Ahmad",
+        ),
+    )
+
+    application = db.land_applications.documents[0]
+    assert certificate["certificate_id"] == "CERT-2026-0099"
+    assert application["status"] == "certificate_issued"
+    assert application["certificate_state"]["certificate_issued"] is True
+    assert application["certificate_state"]["certificate_id"] == "CERT-2026-0099"
+
+
 def test_certificate_requires_approved_application():
     db = FakeDatabase()
     create_application(db, application_payload())

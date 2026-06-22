@@ -443,6 +443,49 @@ def reject_application(
     )
 
 
+def _mark_certificate_issued(
+    database: Database,
+    application: dict[str, Any],
+    certificate_id: str,
+    issued_by: str,
+) -> None:
+    if application["status"] == ApplicationStatus.CERTIFICATE_ISSUED.value:
+        return
+
+    if application["status"] != ApplicationStatus.APPROVED.value:
+        raise ValueError("A certificate can only be issued for an approved application.")
+
+    timestamp = utc_now()
+    database.land_applications.update_one(
+        {"application_id": application["application_id"]},
+        {
+            "$set": {
+                "status": ApplicationStatus.CERTIFICATE_ISSUED.value,
+                "workflow.current_state": ApplicationStatus.CERTIFICATE_ISSUED.value,
+                "workflow.allowed_next": _allowed_values(
+                    ApplicationStatus.CERTIFICATE_ISSUED
+                ),
+                "timestamps.certificate_issued_at": timestamp,
+                "timestamps.updated_at": timestamp,
+                "certificate_state.certificate_issued": True,
+                "certificate_state.certificate_id": certificate_id,
+            }
+        },
+    )
+    append_audit_event(
+        database,
+        application["application_id"],
+        build_audit_event(
+            event_type="certificate_issued",
+            actor_type="registrar",
+            actor_id=issued_by,
+            meta={"certificate_id": certificate_id},
+            previous_state=ApplicationStatus.APPROVED.value,
+            next_state=ApplicationStatus.CERTIFICATE_ISSUED.value,
+        ),
+    )
+
+
 def issue_certificate(
     database: Database,
     application_id: str,
@@ -451,10 +494,29 @@ def issue_certificate(
     application = _find_application(database, application_id)
     existing = database.certificates.find_one({"application_id": application_id})
     if existing:
+        _mark_certificate_issued(
+            database,
+            application,
+            str(existing["certificate_id"]),
+            payload.issued_by,
+        )
         return _serialize(existing)
 
     if application["status"] != ApplicationStatus.APPROVED.value:
         raise ValueError("A certificate can only be issued for an approved application.")
+
+    certificate_request = ApplicationTransitionRequest(
+        target_state=ApplicationStatus.CERTIFICATE_ISSUED,
+        actor_type="registrar",
+        actor_id=payload.issued_by,
+    )
+    validation = validate_transition(
+        application["status"],
+        ApplicationStatus.CERTIFICATE_ISSUED,
+        _transition_context(database, application, certificate_request),
+    )
+    if not validation.is_valid:
+        raise ValueError("; ".join(validation.errors))
 
     timestamp = utc_now()
     certificate_id = _next_certificate_id(database)
@@ -478,46 +540,5 @@ def issue_certificate(
         },
     }
     database.certificates.insert_one(certificate)
-    certificate_request = ApplicationTransitionRequest(
-        target_state=ApplicationStatus.CERTIFICATE_ISSUED,
-        actor_type="registrar",
-        actor_id=payload.issued_by,
-    )
-    validation = validate_transition(
-        application["status"],
-        ApplicationStatus.CERTIFICATE_ISSUED,
-        _transition_context(database, application, certificate_request),
-    )
-    if not validation.is_valid:
-        raise ValueError("; ".join(validation.errors))
-
-    timestamp = utc_now()
-    database.land_applications.update_one(
-        {"application_id": application_id},
-        {
-            "$set": {
-                "status": ApplicationStatus.CERTIFICATE_ISSUED.value,
-                "workflow.current_state": ApplicationStatus.CERTIFICATE_ISSUED.value,
-                "workflow.allowed_next": _allowed_values(
-                    ApplicationStatus.CERTIFICATE_ISSUED
-                ),
-                "timestamps.certificate_issued_at": timestamp,
-                "timestamps.updated_at": timestamp,
-                "certificate_state.certificate_issued": True,
-                "certificate_state.certificate_id": certificate_id,
-            }
-        },
-    )
-    append_audit_event(
-        database,
-        application_id,
-        build_audit_event(
-            event_type="certificate_issued",
-            actor_type="registrar",
-            actor_id=payload.issued_by,
-            meta={"certificate_id": certificate_id},
-            previous_state=ApplicationStatus.APPROVED.value,
-            next_state=ApplicationStatus.CERTIFICATE_ISSUED.value,
-        ),
-    )
+    _mark_certificate_issued(database, application, certificate_id, payload.issued_by)
     return _serialize(certificate)
