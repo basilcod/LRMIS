@@ -14,14 +14,17 @@ Important fields:
 - `application_type`: `first_registration`, `ownership_transfer`, `parcel_subdivision`, `parcel_merge`, `boundary_correction`, `certificate_request`.
 - `status`: current workflow state.
 - `priority`: `low`, `normal`, `high`, `urgent`.
-- `applicant_ref`: applicant ID and applicant type.
-- `parcel_ref`: parcel ID, parcel number, block number, basin number, and zone.
+- `applicant_ref`: applicant ObjectId, applicant type, and representative flag.
+- `parcel_ref`: parcel ObjectId, parcel code, parcel number, block number, basin number, zone, area, land use, and optional GeoJSON geometry snapshot.
 - `workflow`: current state, allowed next states, rules version.
 - `required_documents`: document requirements and verification status.
 - `timestamps`: submitted, pre-checked, surveyed, approved, issued, closed, updated.
 - `assignment`: assigned surveyor and registrar references.
 - `objection`: objection flag and linked objection IDs.
+- `certificate_state`: certificate issued flag and linked certificate ID.
 - `internal`: staff-only notes.
+- `hold`: hold reason, staff actor, and timestamp when the application is on hold.
+- `rejection`: rejection reason, staff actor, and timestamp when rejected.
 
 ## parcels
 
@@ -37,6 +40,7 @@ Important fields:
 - `registration_status`.
 - `geometry`: GeoJSON `Polygon` or `MultiPolygon`.
 - `dispute_state`.
+- `application_id`: latest application that created or refreshed the parcel snapshot.
 
 ## applicants
 
@@ -166,6 +170,12 @@ Important fields:
 - `event_stream.at`.
 - `event_stream.meta`.
 - `computed_kpis`.
+
+Application management events:
+
+- `application_submitted`.
+- `workflow_transition`.
+- `certificate_issued`.
 
 Applicant portal events:
 
