@@ -26,14 +26,75 @@ Example create request:
 {
   "application_type": "ownership_transfer",
   "priority": "normal",
-  "applicant_id": "675100000000000000000101",
-  "parcel_number": "145",
-  "block_number": "12",
-  "basin_number": "3",
-  "zone_id": "ZONE-RM-01",
-  "description": "Ownership transfer application for parcel 145, block 12."
+  "applicant_ref": {
+    "applicant_id": "675100000000000000000101",
+    "applicant_type": "citizen",
+    "submitted_by_representative": false
+  },
+  "parcel_ref": {
+    "parcel_number": "145",
+    "block_number": "12",
+    "basin_number": "3",
+    "zone_id": "ZONE-RM-01",
+    "geometry": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [35.2001, 31.9001],
+          [35.2008, 31.9001],
+          [35.2008, 31.9008],
+          [35.2001, 31.9001]
+        ]
+      ]
+    },
+    "area_sqm": 840.5,
+    "land_use": "residential"
+  },
+  "description": "Ownership transfer application for parcel 145, block 12.",
+  "required_documents": [
+    {
+      "document_type": "ownership_deed",
+      "required": true,
+      "status": "uploaded"
+    }
+  ]
 }
 ```
+
+Transition example:
+
+```json
+{
+  "target_state": "pre_checked",
+  "actor_type": "registrar",
+  "actor_id": "registrar_09",
+  "note": "Initial staff pre-check completed.",
+  "has_objection": false,
+  "survey_report_exists": false,
+  "legal_review_completed": false
+}
+```
+
+Certificate issue example:
+
+```json
+{
+  "certificate_type": "ownership_certificate",
+  "issued_by": "registrar_09",
+  "issued_to_name": "Nour Ahmad"
+}
+```
+
+Rules:
+
+- Applications start in `submitted` and store a parcel snapshot in `parcels`.
+- `applicant_ref.applicant_id` must reference an applicant ObjectId string.
+- `pre_checked` requires complete applicant and parcel data.
+- `survey_required` requires parcel GeoJSON coordinates.
+- `surveyed` requires survey report metadata or `survey_report_exists: true`.
+- `legal_review` requires at least one uploaded ownership document such as `ownership_deed` or `sale_contract`.
+- `approved` requires `legal_review_completed: true`.
+- Certificate generation is only allowed for `approved` applications and moves the application to `certificate_issued`.
 
 ## Applicants
 
