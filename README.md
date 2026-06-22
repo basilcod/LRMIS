@@ -84,6 +84,16 @@ The frontend will use React with Leaflet for the map screens.
 ```bash
 cd frontend
 npm install
+cp .env.example .env
+npm run dev
+```
+
+On Windows PowerShell:
+
+```powershell
+cd frontend
+npm install
+Copy-Item .env.example .env
 npm run dev
 ```
 
@@ -113,6 +123,8 @@ Create `backend/.env` from `backend/.env.example`.
 | `ENVIRONMENT` | `development` | Runtime environment. |
 | `MONGODB_URI` | `mongodb://localhost:27017` | MongoDB connection string. |
 | `MONGODB_DB_NAME` | `lrmis` | MongoDB database name. |
+| `MONGODB_TIMEOUT_MS` | `5000` | MongoDB connection timeout. |
+| `CORS_ORIGINS` | `http://localhost:5173,http://127.0.0.1:5173` | Frontend origins allowed by FastAPI. |
 | `API_HOST` | `127.0.0.1` | Local API host. |
 | `API_PORT` | `8000` | Local API port. |
 
@@ -161,14 +173,31 @@ Postman collection:
 postman/LRMIS.postman_collection.json
 ```
 
+Seed demo data:
+
+```bash
+cd backend
+python seed_data.py
+```
+
+The seed script creates an applicant, parcels with GeoJSON, surveyor, registrar, assigned survey task, an approved certificate-ready application, and an issued certificate sample.
+
 ## Sample Users
 
 | Role | Name | Example ID | Purpose |
 | --- | --- | --- | --- |
 | Applicant | Nour Ahmad | `675100000000000000000101` | Submit and track ownership transfer application. |
-| Surveyor | Survey Team A | `SURV-RM-04` | Receive field survey assignment and upload report metadata. |
-| Registrar | Registrar 09 | `registrar_09` | Review documents, approve, reject, and issue certificate metadata. |
+| Surveyor | Survey Team A / `SURV-RM-04` | `675100000000000000000301` | Receive field survey assignment and upload report metadata. |
+| Registrar | Registrar 01 / `REG-RM-01` | `675100000000000000000302` | Review documents, approve, reject, and issue certificate metadata. |
 | Manager | Manager User | `manager_01` | View dashboards, KPIs, and map. |
+
+Seeded applications:
+
+| Application | Status | Purpose |
+| --- | --- | --- |
+| `LRMIS-2026-0001` | `survey_required` | Surveyor task and field milestone demo. |
+| `LRMIS-2026-0002` | `approved` | Certificate issuance demo. |
+| `LRMIS-2026-0003` | `certificate_issued` | Issued certificate and analytics demo. |
 
 ## Main API Endpoints
 
@@ -242,3 +271,4 @@ postman/LRMIS.postman_collection.json
 - Team tasks: `docs/TEAM_TASKS.md`
 - Demo scenario: `docs/DEMO_SCENARIO.md`
 - GitHub workflow: `docs/GITHUB_WORKFLOW.md`
+- Backend foundation: `docs/BACKEND_FOUNDATION.md`
