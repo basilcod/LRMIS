@@ -49,14 +49,40 @@ Example create request:
 {
   "full_name": "Nour Ahmad",
   "applicant_type": "citizen",
+  "verification_state": "unverified",
   "national_id": "400000000",
-  "email": "nour@example.com",
-  "phone": "+970599000000",
-  "city": "Ramallah",
-  "zone_id": "ZONE-RM-01",
-  "preferred_language": "ar"
+  "registration_number": null,
+  "contacts": {
+    "email": "nour@example.com",
+    "phone": "+970599000000"
+  },
+  "address": {
+    "city": "Ramallah",
+    "neighborhood": "Al Tireh",
+    "zone_id": "ZONE-RM-01"
+  },
+  "preferred_language": "ar",
+  "notification_preferences": {
+    "preferred_contact": "email",
+    "on_status_change": true,
+    "on_missing_documents": true,
+    "on_certificate_ready": true
+  },
+  "privacy_settings": {
+    "share_contact_with_staff": true,
+    "allow_sms_notifications": true,
+    "allow_email_notifications": true
+  }
 }
 ```
+
+Rules:
+
+- `full_name`, contact details, address, applicant type, verification state, preferred language, notification preferences, and privacy settings are required.
+- Either `national_id` or `registration_number` is required.
+- Duplicate `national_id` or duplicate `registration_number` is rejected.
+- Supported applicant types: `citizen`, `lawyer`, `company`, `surveyor`, `authorized_representative`.
+- Supported verification states: `unverified`, `verified`, `suspended`.
 
 ## Documents, Comments, Objections, Timeline
 
@@ -71,12 +97,41 @@ Document metadata example:
 
 ```json
 {
+  "applicant_id": "675100000000000000000101",
   "document_type": "ownership_deed",
   "file_name": "ownership_deed.pdf",
   "storage_ref": "local-demo/ownership_deed.pdf",
   "verification_status": "pending_review"
 }
 ```
+
+Comment example:
+
+```json
+{
+  "applicant_id": "675100000000000000000101",
+  "message": "I uploaded the requested ownership deed."
+}
+```
+
+Objection example:
+
+```json
+{
+  "applicant_id": "675100000000000000000101",
+  "reason": "Boundary information needs registrar review.",
+  "supporting_document_ids": [
+    "675100000000000000000701"
+  ]
+}
+```
+
+Rules:
+
+- Suspended applicants cannot submit documents, comments, or objections.
+- Documents store metadata and review status only; no binary file storage is implemented yet.
+- Comments are recorded as audit timeline events in `performance_logs`.
+- Objections are stored in `objections` and update `land_applications.objection.has_objection` when the application exists.
 
 ## Staff, Surveyors, Registrar
 
