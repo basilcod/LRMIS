@@ -4,7 +4,7 @@ from fastapi import FastAPI
 
 from app.config import get_settings
 from app.database import close_mongo_client
-from app.routers import analytics, applicants, applications, staff
+from app.routers import analytics, applicants, applications, portal, staff
 
 
 @asynccontextmanager
@@ -23,6 +23,7 @@ app = FastAPI(
 )
 
 app.include_router(applications.router)
+app.include_router(portal.router)
 app.include_router(applicants.router)
 app.include_router(staff.router)
 app.include_router(analytics.router)

@@ -46,12 +46,16 @@ Important fields:
 
 - `full_name`.
 - `applicant_type`.
-- `identity.national_id` or company registration number.
+- `verification_state`: `unverified`, `verified`, `suspended`.
+- `identity.national_id` or `identity.registration_number`.
 - `identity.verified`.
 - `contacts.email`, `contacts.phone`.
 - `address`.
-- `preferences`.
-- `stats`.
+- `preferred_language`.
+- `notification_preferences`.
+- `privacy_settings`.
+- `linked_applications`.
+- `created_at`, `updated_at`.
 
 ## application_documents
 
@@ -60,6 +64,7 @@ Stores metadata for uploaded or registered documents.
 Important fields:
 
 - `application_id`.
+- `application_object_id`.
 - `applicant_id`.
 - `document_type`.
 - `file_name`.
@@ -67,6 +72,7 @@ Important fields:
 - `verification_status`: `pending_review`, `verified`, `rejected`.
 - `reviewed_by`.
 - `review_notes`.
+- `created_at`, `updated_at`.
 
 ## objections
 
@@ -75,12 +81,14 @@ Stores objections submitted against applications or parcels.
 Important fields:
 
 - `application_id`.
+- `application_object_id`.
 - `parcel_id`.
 - `submitted_by`.
 - `reason`.
 - `status`: `submitted`, `under_review`, `accepted`, `rejected`, `resolved`.
 - `supporting_document_ids`.
 - `decision_notes`.
+- `created_at`, `updated_at`.
 
 ## staff_members
 
@@ -144,6 +152,12 @@ Important fields:
 - `event_stream.at`.
 - `event_stream.meta`.
 - `computed_kpis`.
+
+Applicant portal events:
+
+- `document_added`.
+- `comment_added`.
+- `objection_submitted`.
 
 ## certificates
 
