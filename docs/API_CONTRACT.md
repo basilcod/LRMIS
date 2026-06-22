@@ -144,11 +144,107 @@ Rules:
 | `POST` | `/applications/{application_id}/survey-report` | Upload or register survey report metadata. |
 | `PATCH` | `/applications/{application_id}/registrar-review` | Submit registrar legal review decision. |
 
+Create staff example:
+
+```json
+{
+  "staff_code": "SURV-RM-04",
+  "name": "Survey Team A",
+  "role": "surveyor",
+  "department": "Cadastral Survey",
+  "skills": [
+    "boundary_survey",
+    "gps_mapping"
+  ],
+  "coverage": {
+    "zone_ids": [
+      "ZONE-RM-01",
+      "ZONE-RM-02"
+    ],
+    "geo_fence": null
+  },
+  "schedule": {
+    "timezone": "Asia/Jerusalem",
+    "shifts": [
+      {
+        "day": "Mon",
+        "start": "08:00",
+        "end": "16:00"
+      }
+    ],
+    "on_call": false
+  },
+  "workload": {
+    "active_tasks": 0,
+    "max_tasks": 10
+  },
+  "contacts": {
+    "email": "survey_a@example.com"
+  },
+  "active": true
+}
+```
+
 Assignment policy:
 
 ```text
 zone match + availability + workload balancing + skill match + priority + existing assigned tasks
 ```
+
+Rules:
+
+- Only active surveyors can be assigned.
+- Surveyor coverage must include the application parcel zone.
+- `workload.active_tasks` must be lower than `workload.max_tasks`.
+- Among matching surveyors, assignment prefers the lowest current workload and existing assigned tasks.
+- Assignment creates a `survey_tasks` record and stores the selected surveyor on the application.
+
+Survey milestone example:
+
+```json
+{
+  "milestone": "visit_scheduled",
+  "by_staff_id": "675100000000000000000301",
+  "actor_role": "surveyor",
+  "notes": "Visit scheduled for Thursday.",
+  "meta": {}
+}
+```
+
+Survey report example:
+
+```json
+{
+  "surveyor_id": "675100000000000000000301",
+  "file_name": "survey_report.pdf",
+  "storage_ref": "local-demo/survey_report.pdf",
+  "summary": "Boundary points verified.",
+  "actor_role": "surveyor"
+}
+```
+
+Registrar review example:
+
+```json
+{
+  "reviewer_id": "675100000000000000000302",
+  "decision": "approved",
+  "notes": "Survey report accepted.",
+  "actor_role": "registrar"
+}
+```
+
+Survey milestones:
+
+```text
+assigned -> visit_scheduled -> arrived_on_site -> survey_started -> survey_completed -> report_uploaded -> registrar_reviewed
+```
+
+Registrar review rules:
+
+- Survey report metadata is required before registrar review.
+- Registrar review stores decision, reviewer, notes, and timestamp.
+- Staff-only actions validate that the referenced staff member exists, is active, and has an allowed role.
 
 ## Analytics and Geofeeds
 

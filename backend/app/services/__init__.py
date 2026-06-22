@@ -4,6 +4,7 @@ from app.services.applicant_service import (
     list_applications_submitted_by_applicant,
     validate_identity_uniqueness,
 )
+from app.services.assignment_service import auto_assign_surveyor, get_assignment_task
 from app.services.audit_service import append_audit_event, build_audit_event
 from app.services.portal_service import (
     add_applicant_comment,
@@ -11,6 +12,9 @@ from app.services.portal_service import (
     get_application_timeline,
     submit_objection,
 )
+from app.services.registrar_service import submit_registrar_review
+from app.services.staff_service import create_staff_member, get_staff_profile, require_staff_role
+from app.services.survey_service import add_survey_milestone, register_survey_report
 from app.services.workflow_service import (
     ALLOWED_TRANSITIONS,
     ALTERNATIVE_STATUSES,
@@ -29,14 +33,22 @@ __all__ = [
     "add_document_metadata",
     "append_audit_event",
     "assert_valid_transition",
+    "auto_assign_surveyor",
     "build_audit_event",
     "create_applicant_profile",
+    "create_staff_member",
     "get_applicant_profile",
     "get_allowed_next_statuses",
+    "get_assignment_task",
     "get_application_timeline",
+    "get_staff_profile",
     "is_transition_allowed",
     "list_applications_submitted_by_applicant",
+    "register_survey_report",
+    "require_staff_role",
+    "add_survey_milestone",
     "submit_objection",
+    "submit_registrar_review",
     "validate_identity_uniqueness",
     "validate_transition",
 ]
