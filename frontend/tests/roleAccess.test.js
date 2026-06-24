@@ -59,3 +59,10 @@ test("only staff can issue certificates", () => {
   assert.equal(policy?.canIssueCertificate("surveyor"), false);
   assert.equal(policy?.canIssueCertificate("manager"), false);
 });
+
+test("dashboard navigation links require exact matching", () => {
+  assert.equal(policy?.requiresExactNavMatch("/applicant"), true);
+  assert.equal(policy?.requiresExactNavMatch("/staff"), true);
+  assert.equal(policy?.requiresExactNavMatch("/applicant/submit"), false);
+  assert.equal(policy?.requiresExactNavMatch("/surveyor/tasks"), false);
+});

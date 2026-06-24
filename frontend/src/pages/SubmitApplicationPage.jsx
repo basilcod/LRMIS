@@ -1,7 +1,22 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { applicantsApi, applicationsApi, errorMessage } from "../api/client";
-import { applicantTypes, applicationTypes } from "../data/options";
+import {
+  identityFieldForApplicantType,
+  identityValuesForApplicant
+} from "../applicants/identity";
+import {
+  applicantFormFromProfile,
+  clearCurrentApplicantId,
+  loadCurrentApplicantId,
+  saveCurrentApplicantId
+} from "../applicants/session";
+import {
+  applicantTypes,
+  applicationTypeOptions,
+  parcelFieldOptions,
+  zoneOptions
+} from "../data/options";
 
 const defaultApplicant = {
   full_name: "Nour Ahmad",
@@ -49,10 +64,60 @@ const defaultApplication = {
 export function SubmitApplicationPage() {
   const [applicant, setApplicant] = useState(defaultApplicant);
   const [application, setApplication] = useState(defaultApplication);
-  const [applicantId, setApplicantId] = useState("");
+  const [applicantId, setApplicantId] = useState(
+    () => loadCurrentApplicantId(localStorage) || ""
+  );
   const [result, setResult] = useState(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const identityField = identityFieldForApplicantType(applicant.applicant_type);
+
+  useEffect(() => {
+    const savedApplicantId = loadCurrentApplicantId(localStorage);
+    if (!savedApplicantId) {
+      return undefined;
+    }
+
+    let cancelled = false;
+    setLoading(true);
+    setError("");
+
+    applicantsApi
+      .get(savedApplicantId)
+      .then((profile) => {
+        if (cancelled) {
+          return;
+        }
+        setApplicant(applicantFormFromProfile(profile));
+        setApplicantId(savedApplicantId);
+        setResult({ type: "Applicant profile loaded", id: savedApplicantId });
+      })
+      .catch(() => {
+        if (cancelled) {
+          return;
+        }
+        clearCurrentApplicantId(localStorage);
+        setApplicantId("");
+        setError("Saved applicant profile could not be loaded.");
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  function useDifferentProfile() {
+    clearCurrentApplicantId(localStorage);
+    setApplicant(defaultApplicant);
+    setApplicantId("");
+    setResult(null);
+    setError("");
+  }
 
   async function createApplicant(event) {
     event.preventDefault();
@@ -61,9 +126,10 @@ export function SubmitApplicationPage() {
     try {
       const payload = {
         ...applicant,
-        registration_number: applicant.registration_number || null
+        ...identityValuesForApplicant(applicant)
       };
       const created = await applicantsApi.create(payload);
+      saveCurrentApplicantId(localStorage, created.applicant_id);
       setApplicantId(created.applicant_id);
       setResult({ type: "Applicant created", id: created.applicant_id });
     } catch (requestError) {
@@ -121,6 +187,15 @@ export function SubmitApplicationPage() {
     <div className="two-column">
       <form className="panel form-panel" onSubmit={createApplicant}>
         <h2>Create applicant profile</h2>
+        {applicantId && (
+          <div className="notice">
+            <strong>Current applicant profile</strong>
+            <span>{applicantId}</span>
+            <button type="button" onClick={useDifferentProfile}>
+              Use a different profile
+            </button>
+          </div>
+        )}
         <label>
           Full name
           <input
@@ -132,9 +207,16 @@ export function SubmitApplicationPage() {
           Applicant type
           <select
             value={applicant.applicant_type}
-            onChange={(event) =>
-              setApplicant({ ...applicant, applicant_type: event.target.value })
-            }
+            onChange={(event) => {
+              const applicantType = event.target.value;
+              setApplicant({
+                ...applicant,
+                applicant_type: applicantType,
+                national_id: applicantType === "company" ? "" : applicant.national_id,
+                registration_number:
+                  applicantType === "company" ? applicant.registration_number : ""
+              });
+            }}
           >
             {applicantTypes.map((type) => (
               <option key={type}>{type}</option>
@@ -142,10 +224,17 @@ export function SubmitApplicationPage() {
           </select>
         </label>
         <label>
-          National ID
+          {identityField.label}
           <input
-            value={applicant.national_id}
-            onChange={(event) => setApplicant({ ...applicant, national_id: event.target.value })}
+            value={applicant[identityField.key]}
+            placeholder={identityField.placeholder}
+            required
+            onChange={(event) =>
+              setApplicant({
+                ...applicant,
+                [identityField.key]: event.target.value
+              })
+            }
           />
         </label>
         <label>
@@ -195,28 +284,53 @@ export function SubmitApplicationPage() {
               setApplication({ ...application, application_type: event.target.value })
             }
           >
-            {applicationTypes.map((type) => (
-              <option key={type}>{type}</option>
+            {applicationTypeOptions.map((type) => (
+              <option key={type.value} value={type.value}>
+                {type.label}
+              </option>
             ))}
           </select>
         </label>
-        {["parcel_number", "block_number", "basin_number", "zone_id", "area_sqm"].map((field) => (
-          <label key={field}>
-            {field}
+        {parcelFieldOptions.map((field) => (
+          <label key={field.key}>
+            {field.label}
             <input
-              value={application.parcel_ref[field]}
+              value={application.parcel_ref[field.key]}
+              inputMode={field.inputMode}
+              required
               onChange={(event) =>
                 setApplication({
                   ...application,
                   parcel_ref: {
                     ...application.parcel_ref,
-                    [field]: event.target.value
+                    [field.key]: event.target.value
                   }
                 })
               }
             />
           </label>
         ))}
+        <label>
+          Zone
+          <select
+            value={application.parcel_ref.zone_id}
+            onChange={(event) =>
+              setApplication({
+                ...application,
+                parcel_ref: {
+                  ...application.parcel_ref,
+                  zone_id: event.target.value
+                }
+              })
+            }
+          >
+            {zoneOptions.map((zone) => (
+              <option key={zone.value} value={zone.value}>
+                {zone.label}
+              </option>
+            ))}
+          </select>
+        </label>
         <label>
           Description
           <textarea

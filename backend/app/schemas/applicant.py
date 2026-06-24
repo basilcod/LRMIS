@@ -50,6 +50,13 @@ class CreateApplicantRequest(LRMISBaseModel):
 
     @model_validator(mode="after")
     def require_identity(self):
+        if (
+            self.applicant_type == ApplicantType.COMPANY
+            and not self.registration_number
+        ):
+            raise ValueError(
+                "registration_number is required for company applicants"
+            )
         if not self.national_id and not self.registration_number:
             raise ValueError("national_id or registration_number is required")
         return self

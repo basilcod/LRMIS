@@ -52,6 +52,7 @@ Important fields:
 - `applicant_type`.
 - `verification_state`: `unverified`, `verified`, `suspended`.
 - `identity.national_id` or `identity.registration_number`.
+- Company profiles use `identity.registration_number` and leave `identity.national_id` as `null`.
 - `identity.verified`.
 - `contacts.email`, `contacts.phone`.
 - `address`.

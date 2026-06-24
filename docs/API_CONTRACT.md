@@ -141,6 +141,7 @@ Rules:
 
 - `full_name`, contact details, address, applicant type, verification state, preferred language, notification preferences, and privacy settings are required.
 - Either `national_id` or `registration_number` is required.
+- Company applicants must provide `registration_number`; their `national_id` is stored as `null`.
 - Duplicate `national_id` or duplicate `registration_number` is rejected.
 - Supported applicant types: `citizen`, `lawyer`, `company`, `surveyor`, `authorized_representative`.
 - Supported verification states: `unverified`, `verified`, `suspended`.

@@ -155,6 +155,25 @@ def test_create_applicant_rejects_duplicate_national_id():
         create_applicant_profile(db, applicant_request())
 
 
+def test_company_applicant_requires_registration_number():
+    with pytest.raises(ValueError, match="registration_number"):
+        CreateApplicantRequest(
+            full_name="Land Holdings Company",
+            applicant_type=ApplicantType.COMPANY,
+            national_id="400000099",
+            contacts=ContactDetails(
+                email="office@landholdings.example",
+                phone="+970599000099",
+            ),
+            address=Address(
+                city="Ramallah",
+                zone_id="ZONE-RM-01",
+            ),
+            notification_preferences=NotificationPreferences(),
+            privacy_settings=PrivacySettings(),
+        )
+
+
 def test_verified_applicant_sets_identity_verified_flag():
     db = FakeDatabase()
 
