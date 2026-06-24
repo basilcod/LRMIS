@@ -1,6 +1,9 @@
 import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
 
-import { roleNavigation } from "../routing/roleAccess";
+import {
+  requiresExactNavMatch,
+  roleNavigation
+} from "../routing/roleAccess";
 
 export function AppShell({ role, setRole }) {
   const location = useLocation();
@@ -18,7 +21,7 @@ export function AppShell({ role, setRole }) {
         </Link>
         <nav>
           {links.map(([label, href]) => (
-            <NavLink key={href} to={href}>
+            <NavLink key={href} to={href} end={requiresExactNavMatch(href)}>
               {label}
             </NavLink>
           ))}

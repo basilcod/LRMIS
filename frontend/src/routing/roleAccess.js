@@ -76,3 +76,7 @@ export function isPathAllowed(role, pathname) {
 export function canIssueCertificate(role) {
   return role === "staff";
 }
+
+export function requiresExactNavMatch(pathname) {
+  return pathname === "/applicant" || pathname === "/staff";
+}
