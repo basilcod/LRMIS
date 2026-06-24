@@ -1,3 +1,7 @@
+import { useNavigate } from "react-router-dom";
+
+import { homeForRole } from "../routing/roleAccess";
+
 const roles = [
   {
     id: "applicant",
@@ -22,6 +26,13 @@ const roles = [
 ];
 
 export function RoleSelectionPage({ setRole }) {
+  const navigate = useNavigate();
+
+  function selectRole(role) {
+    setRole(role);
+    navigate(homeForRole(role), { replace: true });
+  }
+
   return (
     <section className="role-selection">
       <div className="hero-panel">
@@ -34,7 +45,7 @@ export function RoleSelectionPage({ setRole }) {
       </div>
       <div className="role-grid">
         {roles.map((role) => (
-          <button key={role.id} type="button" onClick={() => setRole(role.id)}>
+          <button key={role.id} type="button" onClick={() => selectRole(role.id)}>
             <strong>{role.title}</strong>
             <span>{role.description}</span>
           </button>
