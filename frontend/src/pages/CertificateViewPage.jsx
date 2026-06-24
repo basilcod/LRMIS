@@ -5,7 +5,7 @@ import { applicationsApi, errorMessage } from "../api/client";
 import { DataState } from "../components/DataState";
 import { StatusBadge } from "../components/StatusBadge";
 
-export function CertificateViewPage() {
+export function CertificateViewPage({ canIssue = false }) {
   const [searchParams] = useSearchParams();
   const initialId = useMemo(() => searchParams.get("applicationId") || "LRMIS-2026-0001", [searchParams]);
   const [applicationId, setApplicationId] = useState(initialId);
@@ -77,7 +77,7 @@ export function CertificateViewPage() {
                 <dd>{application.certificate_state?.certificate_issued ? "Issued" : "Pending"}</dd>
               </div>
             </dl>
-            {application.status === "approved" && (
+            {canIssue && application.status === "approved" && (
               <button type="button" onClick={issueCertificate}>
                 Issue certificate metadata
               </button>

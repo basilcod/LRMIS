@@ -1,34 +1,10 @@
 import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
 
-const navByRole = {
-  applicant: [
-    ["Applicant Dashboard", "/applicant"],
-    ["Submit Application", "/applicant/submit"],
-    ["Track Application", "/applicant/track"],
-    ["Certificate", "/certificate"]
-  ],
-  staff: [
-    ["Staff Dashboard", "/staff"],
-    ["Applications", "/staff/applications"],
-    ["Map", "/map"],
-    ["Analytics", "/analytics"]
-  ],
-  surveyor: [
-    ["Survey Tasks", "/surveyor/tasks"],
-    ["Map", "/map"],
-    ["Analytics", "/analytics"]
-  ],
-  manager: [
-    ["Analytics", "/analytics"],
-    ["Applications", "/staff/applications"],
-    ["Map", "/map"],
-    ["Staff Dashboard", "/staff"]
-  ]
-};
+import { roleNavigation } from "../routing/roleAccess";
 
 export function AppShell({ role, setRole }) {
   const location = useLocation();
-  const links = navByRole[role] || navByRole.applicant;
+  const links = roleNavigation[role] || [];
 
   return (
     <div className="app-shell">
