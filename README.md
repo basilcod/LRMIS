@@ -8,9 +8,9 @@ The project is intentionally organized around the required modules from the fina
 
 | Student | Module | Main Responsibility |
 | --- | --- | --- |
-| Student 1 | Land Application Management | Applications, parcels, workflow transitions, certificates, audit logs. |
-| Student 2 | Applicant Portal and Profiles | Applicant profiles, documents, comments, objections, timeline. |
-| Student 3 | Surveyors, Registrar, and Assignment | Staff, surveyor assignment, survey tasks, survey reports, registrar review. |
+| Ezz | Land Application Management | Applications, parcels, workflow transitions, certificates, audit logs. |
+| Basil | Applicant Portal and Profiles | Applicant profiles, documents, comments, objections, timeline. |
+| Ahmad | Surveyors, Registrar, and Assignment | Staff, surveyor assignment, survey tasks, survey reports, registrar review. |
 | Group | Analytics, Map, and Visualization | KPIs, dashboards, GeoJSON feeds, Leaflet map, reports. |
 
 ## Tech Stack
