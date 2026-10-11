@@ -2,7 +2,35 @@
 
 LRMIS is a university final project for a workflow-driven land registration system. It manages land registration applications, applicant profiles, parcels, field survey tasks, registrar review, official certificate metadata, analytics, and map visualization.
 
-The project is intentionally organized around the required modules from the final project guidelines. The first delivery goal is a clean GitHub-ready structure, clear API contract, database design, workflow rules, sample requests, and a demo plan.
+The repository includes a React/Vite frontend, a FastAPI backend, MongoDB seed data, service tests, and API documentation.
+
+## Reviewer overview
+
+- **Workflow:** application submission, survey assignment, legal review, and certificate metadata.
+- **Applicant portal:** identity/profile handling, documents, comments, objections, and timelines.
+- **Visualization:** dashboards and Leaflet maps backed by GeoJSON endpoints.
+- **Basil’s documented team responsibility:** Applicant Portal and Profiles; see the team table below and [team tasks](docs/TEAM_TASKS.md). This is a group project.
+
+**Demo scope:** role selection and frontend route guards are not authentication. Backend routes do not establish an authenticated user identity. Run with sample data locally; production use requires server-side authentication and authorization. Document uploads and certificates currently represent metadata, not a complete file-storage or legally signed certificate service.
+
+## Verification
+
+```bash
+# From the repository root, after installing backend dependencies
+cd backend
+python -m pytest -q
+python -m compileall -q app
+
+# In a separate terminal from the repository root
+cd frontend
+npm ci
+npm test
+npm run build
+```
+
+Backend service tests use in-memory test doubles and do not require a running MongoDB server. They do not replace integration tests against MongoDB. The application itself requires MongoDB. CI runs backend tests and frontend tests/build on pull requests.
+
+For a walkthrough, follow [the demo scenario](docs/DEMO_SCENARIO.md) and the seeded IDs below.
 
 ## Team Module Distribution
 
@@ -79,11 +107,11 @@ http://127.0.0.1:8000/docs
 
 ## Frontend Setup
 
-The frontend will use React with Leaflet for the map screens.
+The frontend uses React, Vite, and Leaflet. Node.js 20 or later is recommended; CI uses Node.js 20.
 
 ```bash
 cd frontend
-npm install
+npm ci
 cp .env.example .env
 npm run dev
 ```
@@ -92,10 +120,12 @@ On Windows PowerShell:
 
 ```powershell
 cd frontend
-npm install
+npm ci
 Copy-Item .env.example .env
 npm run dev
 ```
+
+Open **http://127.0.0.1:5173/LRMIS/** after starting both services. Vite uses `/LRMIS/` as its base path.
 
 ## MongoDB Setup
 
@@ -173,7 +203,7 @@ Postman collection:
 postman/LRMIS.postman_collection.json
 ```
 
-Seed demo data:
+Seed demo data into a dedicated demo database (the script upserts fixed sample IDs and can overwrite matching records):
 
 ```bash
 cd backend
@@ -272,3 +302,11 @@ Seeded applications:
 - Demo scenario: `docs/DEMO_SCENARIO.md`
 - GitHub workflow: `docs/GITHUB_WORKFLOW.md`
 - Backend foundation: `docs/BACKEND_FOUNDATION.md`
+
+## Deployment boundaries
+
+The GitHub Pages workflow publishes the frontend only. Set the repository variable `VITE_API_BASE_URL` to a reachable HTTPS backend and allow the frontend origin in backend CORS settings. The default `127.0.0.1` API URL is for local development and will not provide a working public demo for visitors. Backend `/health` reports process health; it does not test MongoDB connectivity.
+
+## Known database follow-up
+
+`ensure_indexes()` currently creates a unique index on `identity.national_id`. Company profiles use `identity.registration_number` instead, so multiple companies with a null national ID can conflict in real MongoDB even when in-memory service tests pass. A follow-up should migrate to partial unique indexes for each identity type and add real-database integration coverage. Review existing duplicate data before changing indexes.

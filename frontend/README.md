@@ -6,7 +6,7 @@ React + Vite frontend for the LRMIS university demo. It connects to the FastAPI 
 
 ```bash
 cd frontend
-npm install
+npm ci
 ```
 
 ## Backend URL
@@ -46,8 +46,16 @@ npm run dev
 Open:
 
 ```text
-http://127.0.0.1:5173
+http://127.0.0.1:5173/LRMIS/
 ```
+
+## Tests
+
+```bash
+npm test
+```
+
+These tests cover identity mapping, applicant session data, application options, and frontend role routing. Role routing is not backend authentication.
 
 ## Build
 
